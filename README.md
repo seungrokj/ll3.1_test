@@ -7,7 +7,7 @@
 docker pull srjung/ll3.1_release_retune:latest
 
 export TOKEN="YOUR TF TOKEN"
-docker run -it --device=/dev/kfd --device=/dev/dri --group-add video --shm-size 128G --security-opt seccomp=unconfined --security-opt apparmor=unconfined --cap-add=SYS_PTRACE -v /home/models/:/models -e HUGGINGFACE_HUB_CACHE=/models -e HF_TOKEN=$TOKEN -e VLLM_USE_TRITON_FLASH_ATTN=0 -e PYTORCH_TUNABLEOP_ENABLED=0 -e VLLM_TUNE_FILE=/app/vllm_retune_0812.csv -p 8000:8000 srjung/ll3.1_release_retune:latest python -m vllm.entrypoints.api_server --tensor-parallel-size 8 --enforce-eager --worker-use-ray --max-model-len=8192 --model meta-llama/Meta-Llama-3.1-405B-Instruct
+docker run -it --device=/dev/kfd --device=/dev/dri --group-add video --shm-size 128G --security-opt seccomp=unconfined --security-opt apparmor=unconfined --cap-add=SYS_PTRACE -v $(pwd)/models/:/models -e HUGGINGFACE_HUB_CACHE=/models -e HF_TOKEN=$TOKEN -e VLLM_USE_TRITON_FLASH_ATTN=0 -e PYTORCH_TUNABLEOP_ENABLED=0 -e VLLM_TUNE_FILE=/app/vllm_retune_0812.csv -p 8000:8000 srjung/ll3.1_release_retune:latest python -m vllm.entrypoints.api_server --tensor-parallel-size 8 --enforce-eager --worker-use-ray --max-model-len=8192 --model meta-llama/Meta-Llama-3.1-405B-Instruct
 ```
 
 
