@@ -4,19 +4,15 @@
 ## server setup
 
 ```shell
-docker pull srjung/ll3.1_release:latest
+docker pull srjung/ll3.1_release_retune:latest
 
-# when you saved the HF checkpoint files under $PWD as Meta_Llama-3.1-405B-MP16_HF
-
-docker run --rm --device=/dev/kfd --device=/dev/dri --group-add video --ipc=host --shm-size 16G --security-opt seccomp=unconfined --security-opt apparmor=unconfined -v $PWD:/model -e HUGGINGFACE_HUB_CACHE=/model -e VLLM_USE_TRITON_FLASH_ATTN=0 -p 8000:8000 srjung/ll3.1_release:latest python -m vllm.entrypoints.api_server --tensor-parallel-size 8 --enforce-eager  --worker-use-ray  --max-model-len=8192 --model /model/Meta_Llama-3.1-405B-MP16_HF
-
-#when the meta-llama/Meta-Llama-3.1-405B is saved under $PWD you can also use meta-llama/Meta-Llama-3.1-405B as --model args
-
-docker run --rm --device=/dev/kfd --device=/dev/dri --group-add video --ipc=host --shm-size 16G --security-opt seccomp=unconfined --security-opt apparmor=unconfined -v $PWD:/model -e HUGGINGFACE_HUB_CACHE=/model -e VLLM_USE_TRITON_FLASH_ATTN=0 -p 8000:8000 srjung/ll3.1_release:latest python -m vllm.entrypoints.api_server --tensor-parallel-size 8 --enforce-eager  --worker-use-ray  --max-model-len=8192 --model meta-llama/Meta-Llama-3.1-405B
+export TOKEN="YOUR TF TOKEN"
+docker run -it --device=/dev/kfd --device=/dev/dri --group-add video --shm-size 128G --security-opt seccomp=unconfined --security-opt apparmor=unconfined --cap-add=SYS_PTRACE -v /home/models/:/models -e HUGGINGFACE_HUB_CACHE=/models -e HF_TOKEN=$TOKEN -e VLLM_USE_TRITON_FLASH_ATTN=0 -e PYTORCH_TUNABLEOP_ENABLED=0 -e VLLM_TUNE_FILE=/app/vllm_retune_0812.csv -p 8000:8000 srjung/ll3.1_release_retune:latest python -m vllm.entrypoints.api_server --tensor-parallel-size 8 --enforce-eager --worker-use-ray --max-model-len=8192 --model meta-llama/Meta-Llama-3.1-405B-Instruct
 ```
 
 
 ## client setup: in another shell
+
 ```shell
 curl http://localhost:8000/generate -H "Content-Type: application/json" -d '{ "prompt": "San Francisco City is ", "max_tokens": 200, "temperature": 0.9}' 
 ```
